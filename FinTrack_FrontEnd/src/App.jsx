@@ -1,6 +1,12 @@
 import React from 'react';
-import {Outlet} from 'react-router-dom';
+import {Navigate, Outlet} from 'react-router-dom';
 import Navbar from './components/Navbar';
+import SignUp from './components/SignUp';
+
+const RegisterAndLogout = () => {
+  localStorage.clear ();
+  return <SignUp />;
+};
 
 const App = () => {
   return (
@@ -12,3 +18,4 @@ const App = () => {
 };
 
 export default App;
+export {RegisterAndLogout};

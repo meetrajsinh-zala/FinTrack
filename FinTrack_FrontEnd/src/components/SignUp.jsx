@@ -4,17 +4,41 @@ import {Input} from './ui/input';
 import {Textarea} from './ui/textarea';
 import Msg from './Msg';
 import {Button} from './ui/button';
-import {Link} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
+import axios from 'axios';
 
 const SignUp = () => {
-  const [fname, setfname] = useState ('');
-  const [lname, setlname] = useState ('');
-  const [address, setaddress] = useState ('');
-  const [State, setState] = useState ('');
-  const [zipcode, setzipcode] = useState ('');
-  const [dob, setdob] = useState ('');
-  const [email, setemail] = useState ('');
-  const [password, setpassword] = useState ('');
+  const [formData, setFormData] = useState ({
+    first_name: '',
+    last_name: '',
+    address: '',
+    state: '',
+    zip_code: '',
+    username: '',
+    email: '',
+    password: '',
+    date_of_birth: '',
+  });
+  const navigate = useNavigate ();
+
+  const handleChange = e => {
+    setFormData ({...formData, [e.target.name]: e.target.value});
+  };
+
+  const handleSubmit = async e => {
+    e.preventDefault ();
+    try {
+      const response = await axios.post (
+        'http://127.0.0.1:8000/api/signup/',
+        formData
+      );
+      console.log ('User signed up:', response.data);
+      navigate ('/Login');
+    } catch (error) {
+      console.error ('Signup error:', error);
+    }
+  };
+
   return (
     <div className="flex justify-center items-center pt-20 pb-4">
       <div className="w-full max-w-lg p-8 bg-white rounded-lg shadow-lg border flex flex-col gap-5">
@@ -28,8 +52,8 @@ const SignUp = () => {
               type="text"
               placeholder="ex: John"
               className="mt-2"
-              value={fname}
-              onChange={e => setfname (e.target.value)}
+              name="first_name"
+              onChange={handleChange}
             />
           </div>
           <div className="w-full">
@@ -38,16 +62,16 @@ const SignUp = () => {
               type="text"
               placeholder="ex: Doe"
               className="mt-2"
-              value={lname}
-              onChange={e => setlname (e.target.value)}
+              name="last_name"
+              onChange={handleChange}
             />
           </div>
         </div>
         <Label>Address</Label>
         <Textarea
           placeholder="Enter The Address."
-          value={address}
-          onChange={e => setaddress (e.target.value)}
+          name="address"
+          onChange={handleChange}
         />
         <div className="flex gap-6">
           <div className="w-full">
@@ -56,8 +80,8 @@ const SignUp = () => {
               type="text"
               placeholder="ex: Gujarat"
               className="mt-2"
-              value={State}
-              onChange={e => setState (e.target.value)}
+              name="state"
+              onChange={handleChange}
             />
           </div>
           <div className="w-full">
@@ -66,8 +90,8 @@ const SignUp = () => {
               type="number"
               placeholder="ex: 11101"
               className="mt-2"
-              value={zipcode}
-              onChange={e => setzipcode (e.target.value)}
+              name="zip_code"
+              onChange={handleChange}
             />
           </div>
         </div>
@@ -76,24 +100,31 @@ const SignUp = () => {
           type="date"
           placeholder="ex: Gujarat"
           className="mt-2"
-          value={dob}
-          onChange={e => setdob (e.target.value)}
+          name="date_of_birth"
+          onChange={handleChange}
+        />
+        <Label>username</Label>
+        <Input
+          type="text"
+          placeholder="Enter Your username"
+          name="username"
+          onChange={handleChange}
         />
         <Label>Email</Label>
         <Input
           type="email"
           placeholder="Enter Your Email"
-          value={email}
-          onChange={e => setemail (e.target.value)}
+          name="email"
+          onChange={handleChange}
         />
         <Label>Password</Label>
         <Input
           type="password"
           placeholder="Enter Your Password"
-          value={password}
-          onChange={e => setpassword (e.target.value)}
+          name="password"
+          onChange={handleChange}
         />
-        <Button>Sign Up</Button>
+        <Button onClick={e => handleSubmit (e)}>Sign Up</Button>
         <p className="text-center">
           Don't have an account?&nbsp;
           <Link to="/Login" className="text-[#1c284f] font-bold">

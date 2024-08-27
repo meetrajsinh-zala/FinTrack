@@ -2,12 +2,37 @@ import React, {useState} from 'react';
 import {Label} from './ui/label';
 import {Input} from './ui/input';
 import {Button} from './ui/button';
-import {Link} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import Msg from './Msg';
+import axios from 'axios';
 
 const Login = () => {
-  const [email, setemail] = useState ('');
-  const [password, setpassword] = useState ('');
+  const [formData, setFormData] = useState ({username: '', password: ''});
+  const navigate = useNavigate (); // Initialize navigate
+
+  const handleChange = e => {
+    setFormData ({...formData, [e.target.name]: e.target.value});
+  };
+
+  const handleSubmit = async e => {
+    e.preventDefault ();
+    try {
+      const response = await axios.post (
+        'http://127.0.0.1:8000/api/login/',
+        formData
+      );
+      localStorage.setItem ('access_token', response.data.access);
+      localStorage.setItem ('refresh_token', response.data.refresh);
+      navigate ('/Dashboard');
+    } catch (error) {
+      console.error (
+        'Login error:',
+        error.response ? error.response.data : error.message
+      );
+      alert ('Login failed. Please check your credentials and try again.');
+    }
+  };
+
   return (
     <div className="flex h-screen justify-center items-center">
       <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-lg border flex flex-col gap-5">
@@ -18,13 +43,13 @@ const Login = () => {
           }}
         />
         <div>
-          <Label className="text-base mb-3">Email</Label>
+          <Label className="text-base mb-3">Username</Label>
           <Input
-            type="email"
-            placeholder="Enter Your Email"
+            type="text"
+            placeholder="Enter Your Username"
             className="mt-1"
-            value={email}
-            onChange={e => setemail (e.target.value)}
+            name="username"
+            onChange={handleChange}
           />
         </div>
         <div>
@@ -33,11 +58,11 @@ const Login = () => {
             type="password"
             placeholder="Enter Your Password"
             className="mt-1"
-            value={password}
-            onChange={e => setpassword (e.target.value)}
+            name="password"
+            onChange={handleChange}
           />
         </div>
-        <Button>Login</Button>
+        <Button onClick={e => handleSubmit (e)}>Login</Button>
         <p className="text-center">
           Don't have an account?&nbsp;
           <Link to="/Signup" className="text-[#1c284f] font-bold">

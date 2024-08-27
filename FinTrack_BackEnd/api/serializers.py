@@ -1,47 +1,33 @@
-from rest_framework.serializers import ModelSerializer
-from django.contrib.auth.models import User
-from .models import Signup
+from rest_framework import serializers
+from .models import CustomUser
 
 
-class SignupSerializer(ModelSerializer):
+class SignupSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)  # Ensures password is write-only
+
     class Meta:
-        model = Signup
+        model = CustomUser
         fields = [
-            "id",
-            "First_Name",
-            "Last_Name",
-            "Address",
-            "State",
-            "Zip_Code",
-            "DOB",
+            "first_name",
+            "last_name",
+            "address",
+            "state",
+            "zip_code",
             "username",
-            "Email",
-            "Password",
+            "email",
+            "password",
+            "date_of_birth",
         ]
-        extra_kwargs = {"Password": {"write_only": True}}
 
-    from django.contrib.auth.models import User
+    def create(self, validated_data):
+        password = validated_data.pop("password", None)
+        user = CustomUser(**validated_data)
+        if password:
+            user.set_password(password)  # Hash the password
+        user.save()
+        return user
 
 
-from rest_framework.exceptions import ValidationError
-
-
-def create(self, validated_data):
-    # Check if the username already exists
-    if User.objects.filter(username=validated_data.get("username")).exists():
-        raise ValidationError("Username already exists.")
-
-    # Hash the password before saving
-    validated_data["Password"] = make_password(validated_data["Password"])
-
-    # Create the user
-    user = User.objects.create_user(
-        username=validated_data["username"],
-        email=validated_data["Email"],
-        password=validated_data["Password"],
-    )
-
-    # Create the Signup instance
-    signup = Signup.objects.create(user=user, **validated_data)
-
-    return signup
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField(required=True)
+    password = serializers.CharField(required=True)
