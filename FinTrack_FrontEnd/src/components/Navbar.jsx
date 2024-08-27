@@ -4,7 +4,13 @@ import Logo from '../assets/Logo.png';
 import {useLocalStorage} from 'react-use';
 
 const Navbar = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState (false);
+  const [accessToken, setaccessToken] = useLocalStorage ('access_token');
+  const navigate = useNavigate ();
+
+  const handleLogout = () => {
+    setaccessToken ('');
+    navigate ('/Login');
+  };
 
   return (
     <div className="flex flex-col">
@@ -17,7 +23,7 @@ const Navbar = () => {
             <img src={Logo} className="h-6 w-6" />
             <span className="text-[#1c284f] font-bold text-xl">FinTrack</span>
           </Link>
-          {isAuthenticated
+          {accessToken
             ? <button
                 className="text-slate border border-zinc-400 px-5 rounded-full py-2 font-medium hover:bg-[#1c284f] hover:text-white hover:border-[#1c284f] transition-all duration-500"
                 onClick={handleLogout}

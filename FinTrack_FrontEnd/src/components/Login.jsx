@@ -5,10 +5,13 @@ import {Button} from './ui/button';
 import {Link, useNavigate} from 'react-router-dom';
 import Msg from './Msg';
 import axios from 'axios';
+import {useLocalStorage} from 'react-use';
 
 const Login = () => {
   const [formData, setFormData] = useState ({username: '', password: ''});
   const navigate = useNavigate (); // Initialize navigate
+  const [accessToken, setaccessToken] = useLocalStorage ('access_token', '');
+  const [refershToken, setrefreshToken] = useLocalStorage ('refresh_token', '');
 
   const handleChange = e => {
     setFormData ({...formData, [e.target.name]: e.target.value});
@@ -21,8 +24,8 @@ const Login = () => {
         'http://127.0.0.1:8000/api/login/',
         formData
       );
-      localStorage.setItem ('access_token', response.data.access);
-      localStorage.setItem ('refresh_token', response.data.refresh);
+      setaccessToken (response.data.access);
+      setrefreshToken (response.data.refresh);
       navigate ('/Dashboard');
     } catch (error) {
       console.error (
