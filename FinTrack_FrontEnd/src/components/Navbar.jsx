@@ -1,16 +1,25 @@
-import React, {useState, useEffect} from 'react';
-import {Link, Navigate, useNavigate} from 'react-router-dom';
+import React, {useEffect, useState} from 'react';
+import {Link, useNavigate} from 'react-router-dom';
 import Logo from '../assets/Logo.png';
 import {useLocalStorage} from 'react-use';
 
 const Navbar = () => {
-  const [accessToken, setaccessToken] = useLocalStorage ('access_token');
+  const [accessToken, setaccessToken] = useState (null);
+  const [token, setToken, removeToken] = useLocalStorage ('access_token');
   const navigate = useNavigate ();
 
   const handleLogout = () => {
-    setaccessToken ('');
+    // setaccessToken (null);
+    removeToken ();
     navigate ('/Login');
   };
+
+  useEffect (
+    () => {
+      setaccessToken (localStorage.getItem ('access_token'));
+    },
+    [localStorage.getItem ('access_token')]
+  );
 
   return (
     <div className="flex flex-col">

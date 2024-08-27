@@ -9,7 +9,7 @@ import {useLocalStorage} from 'react-use';
 
 const Login = () => {
   const [formData, setFormData] = useState ({username: '', password: ''});
-  const navigate = useNavigate (); // Initialize navigate
+  const navigate = useNavigate ();
   const [accessToken, setaccessToken] = useLocalStorage ('access_token', '');
   const [refershToken, setrefreshToken] = useLocalStorage ('refresh_token', '');
 
