@@ -1,5 +1,5 @@
-django
-djangorestframework
-corsheaders
-djangorestframework-simplejwt
-PyJWT
+Django>=4.0,<5.0
+djangorestframework>=3.13.1,<4.0
+django-cors-headers>=3.13.0
+djangorestframework-simplejwt>=5.2.0
+PyJWT>=2.4.0,<3.0

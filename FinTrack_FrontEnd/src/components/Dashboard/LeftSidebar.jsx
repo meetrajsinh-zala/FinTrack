@@ -8,7 +8,7 @@ import {
   ArrowRightLeft,
 } from 'lucide-react';
 
-const Sidebar = () => {
+const LeftSidebar = () => {
   return (
     <div className="hidden border-r bg-muted/40 md:block h-screen">
       <div className="flex h-full max-h-screen flex-col gap-2 pt-4">
@@ -56,4 +56,4 @@ const Sidebar = () => {
   );
 };
 
-export default Sidebar;
+export default LeftSidebar;

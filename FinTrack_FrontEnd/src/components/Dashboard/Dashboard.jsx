@@ -1,12 +1,15 @@
-import React from 'react';
-import Sidebar from './Sidebar';
-import Body from './Body';
+import React from "react";
+import Sidebar from "./LeftSidebar";
+import Body from "./Body";
+import LeftSidebar from "./LeftSidebar";
+import RightSidebar from "./RightSidebar";
 
 const Dashboard = () => {
   return (
     <div className="flex w-full pt-16 pb-4">
-      <Sidebar />
+      <LeftSidebar />
       <Body />
+      <RightSidebar />
     </div>
   );
 };
