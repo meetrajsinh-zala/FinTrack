@@ -1,17 +1,17 @@
-import React from "react";
-import { Card, CardHeader, CardTitle } from "../ui/card";
-import { Progress } from "../ui/progress";
-import { Plus } from "lucide-react";
+import React from 'react';
+import {Card, CardHeader, CardTitle} from '../ui/card';
+import {Progress} from '../ui/progress';
+import {Plus} from 'lucide-react';
 
 const RightSidebar = () => {
   return (
     <Card className="h-fit mt-5 px-4 py-3 w-full sm:w-[18%] flex flex-col gap-5 border-none shadow-none">
-      <CardHeader className="flex justify-between items-center">
+      <div className="flex justify-between items-center">
         <h3>My Budgets</h3>
-        <button>
-          <Plus width="20" height={20} />
+        <button className="hover:bg-[#1570ef] rounded-full px-1 hover:text-white py-[0.1rem]">
+          <Plus width={20} />
         </button>
-      </CardHeader>
+      </div>
       <div className="flex flex-col justify-between gap-2">
         <div className="flex justify-between text-sm">
           <p className="text-[#054F31]">Saving</p>
