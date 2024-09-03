@@ -6,6 +6,7 @@ import Msg from './Msg';
 import {Button} from './ui/button';
 import {Link, useNavigate} from 'react-router-dom';
 import axios from 'axios';
+import PlaidLink from './PlaidLink';
 
 const SignUp = () => {
   const [formData, setFormData] = useState ({
@@ -45,6 +46,7 @@ const SignUp = () => {
         <Msg
           Data={{Heading: 'Sign Up', SubHeading: 'Please enter your details.'}}
         />
+        <PlaidLink variant="primary" />
         <div className="flex gap-6">
           <div className="w-full">
             <Label>First Name</Label>
