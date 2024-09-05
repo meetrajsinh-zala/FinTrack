@@ -1,7 +1,7 @@
-import React from 'react';
-import {Card, CardHeader, CardTitle} from '../ui/card';
-import {Progress} from '../ui/progress';
-import {Plus} from 'lucide-react';
+import React from "react";
+import { Card } from "../ui/card";
+import { Progress } from "../ui/progress";
+import { Plus } from "lucide-react";
 
 const RightSidebar = () => {
   return (
