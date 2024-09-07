@@ -1,7 +1,14 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import {Button} from './ui/button';
 
+
 const PlaidLink = ({variant}) => {
+  const onSuccess = useCallback(async() => {},[user])
+  
+  const config = {
+    token,
+    onSuccess
+  };
   return (
     <React.Fragment>
       {variant === 'primary'
