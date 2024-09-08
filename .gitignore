@@ -1,2 +1,3 @@
 env
 PLAID_CONFIG.txt
+.env

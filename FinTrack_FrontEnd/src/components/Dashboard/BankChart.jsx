@@ -1,10 +1,10 @@
 import React from 'react';
-import {Plus} from 'lucide-react';
 import CountUp from 'react-countup';
 import {Button} from '../ui/button';
 import {Card} from '../ui/card';
 import {Doughnut} from 'react-chartjs-2';
 import {ArcElement, Chart, Legend, Tooltip} from 'chart.js';
+import PlaidConnect from '../PlaidConnect';
 
 Chart.register (ArcElement, Tooltip, Legend);
 
@@ -57,9 +57,7 @@ const BankChart = () => {
           </div>
         </div>
         <div className="w-full flex justify-end md:justify-start md:w-auto mt-4 md:mt-0">
-          <Button className="w-full md:w-auto px-3 py-2 gap-1 text-[#338eff] hover:text-[#1c284f] bg-transparent hover:bg-transparent transition-all duration-500">
-            <Plus /> Connect Bank
-          </Button>
+          <PlaidConnect />
         </div>
       </div>
     </Card>

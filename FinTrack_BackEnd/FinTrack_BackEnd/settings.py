@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     "corsheaders",
 ]
 
-EXTERNAL_APPS = ["api"]
+EXTERNAL_APPS = ["api", "plaidapi"]
 
 INSTALLED_APPS += EXTERNAL_APPS
 
@@ -59,7 +59,10 @@ MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
 ]
 
-CORS_ALLOWED_ORIGINS = ["http://localhost:5173"]
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173",
+]
+CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = "FinTrack_BackEnd.urls"
 
@@ -118,7 +121,7 @@ AUTHENTICATION_BACKENDS = [
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
-    )
+    ),
 }
 
 

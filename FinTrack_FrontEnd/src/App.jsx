@@ -4,7 +4,7 @@ import Navbar from './components/Navbar';
 import SignUp from './components/SignUp';
 
 const RegisterAndLogout = () => {
-  localStorage.clear ();
+  // localStorage.clear ();
   return <SignUp />;
 };
 

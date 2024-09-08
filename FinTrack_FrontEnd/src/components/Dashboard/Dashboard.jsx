@@ -1,8 +1,7 @@
-import React from "react";
-import Sidebar from "./LeftSidebar";
-import Body from "./Body";
-import LeftSidebar from "./LeftSidebar";
-import RightSidebar from "./RightSidebar";
+import React from 'react';
+import Body from './Body';
+import LeftSidebar from './LeftSidebar';
+import RightSidebar from './RightSidebar';
 
 const Dashboard = () => {
   return (
