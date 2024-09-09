@@ -7,12 +7,13 @@ function PlaidConnect () {
   // Function to fetch the link token from the backend
   const fetchLinkToken = async () => {
     try {
+      const token = localStorage.getItem ('access_token');
       const response = await fetch (
         'http://localhost:8000/plaidapi/create_link_token/',
         {
           method: 'POST',
           headers: {
-            Authorization: `Bearer ${localStorage.getItem ('access_token')}`, // JWT token from localStorage
+            Authorization: `Bearer ${token}`, // JWT token from localStorage
           },
         }
       );
@@ -44,7 +45,10 @@ function PlaidConnect () {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${localStorage.getItem ('access_token')}`, // Ensure JWT token is sent for this request
           },
-          body: JSON.stringify ({public_token}),
+          body: JSON.stringify ({
+            public_token,
+            access_token: localStorage.getItem ('access_token'),
+          }),
         }
       );
 
