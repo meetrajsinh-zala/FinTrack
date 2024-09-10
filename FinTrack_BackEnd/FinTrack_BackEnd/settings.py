@@ -30,7 +30,7 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
-AUTH_USER_MODEL = "api.CustomUser"
+AUTH_USER_MODEL = "auth.User"
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -122,11 +122,10 @@ AUTHENTICATION_BACKENDS = [
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
-        "rest_framework.authentication.SessionAuthentication",
     ),
-    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
 }
 
+from datetime import timedelta
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/

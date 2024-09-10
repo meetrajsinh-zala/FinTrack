@@ -12,6 +12,8 @@ const Login = () => {
   const navigate = useNavigate ();
   const [accessToken, setaccessToken] = useLocalStorage ('access_token', '');
   const [refershToken, setrefreshToken] = useLocalStorage ('refresh_token', '');
+  const [user, setuser] = useLocalStorage ('username', '');
+  const [email, setemail] = useLocalStorage ('emali', '');
 
   const handleChange = e => {
     setFormData ({...formData, [e.target.name]: e.target.value});
@@ -26,6 +28,8 @@ const Login = () => {
       );
       setaccessToken (response.data.access);
       setrefreshToken (response.data.refresh);
+      setuser (response.data.user.username);
+      setemail (response.data.user.email);
       navigate ('/Dashboard');
     } catch (error) {
       console.error (

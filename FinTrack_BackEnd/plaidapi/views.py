@@ -1,11 +1,6 @@
-from rest_framework import status
-from rest_framework.response import Response
 import os
 from dotenv import load_dotenv
-import jwt
-from django.conf import settings
 import json
-import logging
 from django.views.decorators.csrf import csrf_exempt
 import plaid.configuration
 from plaid.model.link_token_create_request import LinkTokenCreateRequest
@@ -18,14 +13,21 @@ from plaid.model.country_code import CountryCode
 import plaid
 from plaid.api import plaid_api
 from django.http import JsonResponse
+
 from .models import PlaidAccount
 from django.contrib.auth.models import User
+from plaid.model.accounts_get_request import AccountsGetRequest
+from plaid.model.processor_token_create_request import ProcessorTokenCreateRequest
+
+from dwollav2 import Client
 
 load_dotenv()
 
 PLAID_CLIENT_ID = os.getenv("PLAID_CLIENT_ID")
 PLAID_SECRET = os.getenv("PLAID_SECRET")
 PLAID_ENV = os.getenv("PLAID_ENV", "sandbox")
+DWOLLA_KEY = os.getenv("DWOLLA_KEY")
+DWOLLA_SECRET = os.getenv("DWOLLA_SECRET")
 
 configuration = plaid.Configuration(
     host=plaid.Environment.Sandbox,
@@ -38,12 +40,19 @@ configuration = plaid.Configuration(
 api_client = plaid.ApiClient(configuration)
 client = plaid_api.PlaidApi(api_client)
 
+dwolla_client = Client(
+    key=DWOLLA_KEY,
+    secret=DWOLLA_SECRET,
+    environment="sandbox",
+)
+
 
 @csrf_exempt
 def create_link_token(request):
-    user = request.user
+    body = json.loads(request.body)
+    username = body["username"]
+    user = User.objects.get(username=username)
     client_user_id = str(user.id)
-    print(client_user_id)
     Link_token = LinkTokenCreateRequest(
         products=[Products("auth"), Products("transactions")],
         client_name="FinTrack",
@@ -57,54 +66,47 @@ def create_link_token(request):
 
 @csrf_exempt
 def exchange_public_token(request):
-    try:
-        body = json.loads(request.body)
-        public_token = body.get("public_token")
-        access_token = body.get("access_token")
+    body = json.loads(request.body)
+    public_token = body["public_token"]
+    username = body["username"]
+    user = User.objects.get(username=username)
 
-        if access_token:
-            try:
-                payload = jwt.decode(
-                    access_token, settings.SECRET_KEY, algorithms=["HS256"]
-                )
-                user_id = payload.get("user_id")
+    req = ItemPublicTokenExchangeRequest(public_token=public_token)
+    res = client.item_public_token_exchange(req)
 
-                if not user_id:
-                    raise jwt.InvalidTokenError("User ID not found in token")
+    access_token = res["access_token"]
+    item_id = res["item_id"]
 
-                user = User.objects.get(id=user_id)
-                request.user = user  # Set the user on the request object
-            except (
-                jwt.ExpiredSignatureError,
-                jwt.InvalidTokenError,
-                User.DoesNotExist,
-            ) as e:
-                return Response({"error": str(e)}, status=status.HTTP_401_UNAUTHORIZED)
+    plaid_account = PlaidAccount.objects.create(
+        user=user,
+        access_token=access_token,
+        item_id=item_id,
+    )
 
-        if not public_token:
-            return JsonResponse({"error": "public_token not provided"}, status=400)
+    return JsonResponse({"public_token_exchange": "complete"})
 
-        # Exchange public token for access token
-        req = ItemPublicTokenExchangeRequest(public_token=public_token)
-        res = client.item_public_token_exchange(req)
 
-        access_token = res["access_token"]
-        item_id = res["item_id"]
+def get_account(request):
+    user = User.objects.get(username="newuser")
+    user = PlaidAccount.objects.get(user=user.id)
+    access_token = user.access_token
+    req = AccountsGetRequest(
+        access_token=access_token,
+    )
+    accounts_response = client.accounts_get(req)
+    print(accounts_response["accounts"][0]["account_id"])
+    create_processor_token(access_token, accounts_response["accounts"][0]["account_id"])
+    return JsonResponse(accounts_response.to_dict())
 
-        # Save the access token and item_id to the PlaidAccount model
-        user = request.user
-        plaid_account, created = PlaidAccount.objects.get_or_create(user=user)
-        plaid_account.access_token = access_token
-        plaid_account.item_id = item_id
-        plaid_account.save()
 
-        return JsonResponse({"status": "success"})
+def create_processor_token(access_token, account_id):
+    create_request = ProcessorTokenCreateRequest(
+        access_token=access_token, account_id=account_id, processor="dwolla"
+    )
+    create_response = client.processor_token_create(create_request)
+    processor_token = create_response["processor_token"]
+    print(create_response)
 
-    except plaid.ApiException as e:
-        error_response = json.loads(e.body)
-        logging.error(f"Plaid API Error: {error_response}")
-        return JsonResponse({"error": error_response}, status=e.status)
 
-    except Exception as e:
-        logging.error(f"Error exchanging public token: {str(e)}")
-        return JsonResponse({"error": "Something went wrong"}, status=500)
+def dwollo_req():
+    pass

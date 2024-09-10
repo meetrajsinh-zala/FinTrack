@@ -1,12 +1,9 @@
 from django.db import models
-from django.db import models
-from django.conf import settings
+from django.contrib.auth.models import User
 
 
 class PlaidAccount(models.Model):
-    user = models.OneToOneField(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE
-    )  # Link to CustomUser
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     access_token = models.CharField(max_length=255)
     item_id = models.CharField(max_length=255, null=True, blank=True)
     created_at = models.DateTimeField(

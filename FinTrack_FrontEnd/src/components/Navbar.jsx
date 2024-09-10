@@ -5,12 +5,10 @@ import {useLocalStorage} from 'react-use';
 
 const Navbar = () => {
   const [accessToken, setaccessToken] = useState (null);
-  const [token, setToken, removeToken] = useLocalStorage ('access_token');
   const navigate = useNavigate ();
 
   const handleLogout = () => {
-    // setaccessToken (null);
-    removeToken ();
+    localStorage.clear ();
     navigate ('/Login');
   };
 

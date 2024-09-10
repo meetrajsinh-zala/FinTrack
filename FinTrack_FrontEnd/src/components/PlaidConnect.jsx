@@ -1,8 +1,10 @@
 import {PlaidLink} from 'react-plaid-link';
 import {useState, useEffect} from 'react';
+import {useLocalStorage} from 'react-use';
 
 function PlaidConnect () {
   const [linkToken, setLinkToken] = useState (null);
+  const [username, setusername] = useLocalStorage ('username');
 
   // Function to fetch the link token from the backend
   const fetchLinkToken = async () => {
@@ -15,6 +17,9 @@ function PlaidConnect () {
           headers: {
             Authorization: `Bearer ${token}`, // JWT token from localStorage
           },
+          body: JSON.stringify ({
+            username,
+          }),
         }
       );
 
@@ -47,7 +52,7 @@ function PlaidConnect () {
           },
           body: JSON.stringify ({
             public_token,
-            access_token: localStorage.getItem ('access_token'),
+            username,
           }),
         }
       );
