@@ -1,3 +1,5 @@
+import requests
+import base64
 import os
 from dotenv import load_dotenv
 import json
@@ -108,5 +110,22 @@ def create_processor_token(access_token, account_id):
     print(create_response)
 
 
-def dwollo_req():
-    pass
+def dwolla_access_token():
+    credentials = f"{DWOLLA_KEY}:{DWOLLA_SECRET}"
+    encoded_credentials = base64.b64encode(credentials.encode()).decode()
+
+    # Prepare the request
+    url = "https://api-sandbox.dwolla.com/token"
+    headers = {
+        "Authorization": f"Basic {encoded_credentials}",
+        "Content-Type": "application/x-www-form-urlencoded",
+    }
+    payload = {"grant_type": "client_credentials"}
+
+    response = requests.post(url, headers=headers, data=payload)
+
+    if response.status_code == 200:
+        response_json = response.json()
+        access_token = response_json.get("access_token", None)
+        print(access_token)
+
