@@ -9,45 +9,24 @@ from rest_framework_simplejwt.tokens import RefreshToken
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["id", "username", "email", "password", "first_name", "last_name"]
+        fields = ["username", "email", "password", "first_name", "last_name"]
 
 
 class UserDetailsSerializer(serializers.ModelSerializer):
-    user = UserSerializer()  # Nested serializer to include user details
+    user = UserSerializer()
 
     class Meta:
         model = UserDetails
         fields = ["user", "address", "state", "zip_code", "date_of_birth"]
 
     def create(self, validated_data):
+        # Extract the user data and create the user
         user_data = validated_data.pop("user")
-        user = User.objects.create(**user_data)
-        user.set_password(user_data.get("password"))
-        user.save()
+        user = User.objects.create_user(**user_data)
 
+        # Now create the user details with the remaining data
         user_details = UserDetails.objects.create(user=user, **validated_data)
         return user_details
-
-    def update(self, instance, validated_data):
-        # Update nested User object
-        user_data = validated_data.pop("user")
-        user = instance.user
-
-        instance.address = validated_data.get("address", instance.address)
-        instance.state = validated_data.get("state", instance.state)
-        instance.zip_code = validated_data.get("zip_code", instance.zip_code)
-        instance.date_of_birth = validated_data.get(
-            "date_of_birth", instance.date_of_birth
-        )
-        instance.save()
-
-        user.username = user_data.get("username", user.username)
-        user.email = user_data.get("email", user.email)
-        user.first_name = user_data.get("first_name", user.first_name)
-        user.last_name = user_data.get("last_name", user.last_name)
-        user.save()
-
-        return instance
 
 
 class LoginSerializer(serializers.Serializer):

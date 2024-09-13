@@ -9,6 +9,7 @@ from .models import UserDetails
 class SignupView(APIView):
     def post(self, request):
         serializer = UserDetailsSerializer(data=request.data)
+        print(serializer)
         if serializer.is_valid():
             user_details = serializer.save()
             response_data = {
@@ -25,8 +26,11 @@ class SignupView(APIView):
                     "date_of_birth": user_details.date_of_birth,
                 },
             }
+
             return Response(response_data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            print(serializer.errors)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class LoginView(APIView):

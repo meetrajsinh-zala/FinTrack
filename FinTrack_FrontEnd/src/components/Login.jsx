@@ -30,7 +30,7 @@ const Login = () => {
       setrefreshToken (response.data.refresh);
       setuser (response.data.user.username);
       setemail (response.data.user.email);
-      navigate ('/Dashboard');
+      navigate ('/LinkYourBank');
     } catch (error) {
       console.error (
         'Login error:',

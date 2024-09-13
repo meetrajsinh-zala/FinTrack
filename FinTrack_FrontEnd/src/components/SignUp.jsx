@@ -27,10 +27,23 @@ const SignUp = () => {
 
   const handleSubmit = async e => {
     e.preventDefault ();
+    const structuredData = {
+      user: {
+        username: formData.username,
+        email: formData.email,
+        password: formData.password,
+        first_name: formData.first_name,
+        last_name: formData.last_name,
+      },
+      address: formData.address,
+      state: formData.state,
+      zip_code: formData.zip_code,
+      date_of_birth: formData.date_of_birth,
+    };
     try {
       const response = await axios.post (
         'http://127.0.0.1:8000/api/signup/',
-        formData
+        structuredData
       );
       console.log ('User signed up:', response.data);
       navigate ('/Login');

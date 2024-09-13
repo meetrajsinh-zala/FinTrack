@@ -1,10 +1,12 @@
 import {PlaidLink} from 'react-plaid-link';
 import {useState, useEffect} from 'react';
 import {useLocalStorage} from 'react-use';
+import {useNavigate} from 'react-router-dom';
 
 function PlaidConnect () {
   const [linkToken, setLinkToken] = useState (null);
   const [username, setusername] = useLocalStorage ('username');
+  const navigate = useNavigate ();
 
   // Function to fetch the link token from the backend
   const fetchLinkToken = async () => {
@@ -60,6 +62,7 @@ function PlaidConnect () {
       if (response.ok) {
         const data = await response.json ();
         console.log ('Access Token:', data.access_token);
+        navigate ('/Dashboard');
       } else {
         console.error ('Error exchanging public token:', response.statusText);
       }
@@ -69,13 +72,14 @@ function PlaidConnect () {
   };
 
   return (
-    <div>
+    <div className="w-full hover:text-[#1570ef] transition-all duration-300">
       {linkToken
         ? <PlaidLink
             token={linkToken}
             onSuccess={onSuccess}
             onExit={(error, metadata) =>
               console.log ('Exited:', error, metadata)}
+            className="w-full"
           >
             Connect your bank
           </PlaidLink>

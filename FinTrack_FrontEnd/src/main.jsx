@@ -9,6 +9,7 @@ import Dashboard from './components/Dashboard/Dashboard.jsx';
 
 import SignUp from './components/SignUp.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
+import LinkBankAccount from './components/LinkBankAccount.jsx';
 
 const router = createBrowserRouter ([
   {
@@ -26,6 +27,10 @@ const router = createBrowserRouter ([
       {
         path: '/Signup',
         element: <RegisterAndLogout />,
+      },
+      {
+        path: '/LinkYourBank',
+        element: <LinkBankAccount />,
       },
       {
         path: '/Dashboard',
