@@ -48,7 +48,7 @@ const Transaction = ({ accounts }) => {
         </div>
       </Card>
       <BankAccountCard selectedAccount={selectedAccount} />
-      <TransactionTable />
+      <TransactionTable selectedBank={selectedBank} />
     </React.Fragment>
   );
 };

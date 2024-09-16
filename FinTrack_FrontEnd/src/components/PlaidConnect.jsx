@@ -4,6 +4,7 @@ import { useLocalStorage } from "react-use";
 import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Landmark } from "lucide-react";
 
 function PlaidConnect() {
   const [linkToken, setLinkToken] = useState(null);

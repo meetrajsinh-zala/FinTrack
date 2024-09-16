@@ -1,14 +1,13 @@
-import React from 'react';
-import {Link} from 'react-router-dom';
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import {
   Home,
-  Landmark,
   ReceiptText,
   CircleDollarSign,
   ArrowRightLeft,
-} from 'lucide-react';
+} from "lucide-react";
 
-const LeftSidebar = () => {
+const LeftSidebar = ({ selectedPage, setSelectedPage }) => {
   return (
     <div className="hidden border-r bg-muted/40 md:block h-screen">
       <div className="flex h-full max-h-screen flex-col gap-2 pt-4">
@@ -17,6 +16,7 @@ const LeftSidebar = () => {
             <Link
               href="#"
               className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+              onClick={() => setSelectedPage("Home")}
             >
               <Home className="h-4 w-4" />
               Home
@@ -24,6 +24,7 @@ const LeftSidebar = () => {
             <Link
               href="#"
               className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+              onClick={() => setSelectedPage("MyBank")}
             >
               <CircleDollarSign className="h-4 w-4" />
               My Bank
@@ -31,6 +32,7 @@ const LeftSidebar = () => {
             <Link
               href="#"
               className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+              onClick={() => setSelectedPage("TransectionHist")}
             >
               <ReceiptText className="h-4 w-4" />
               Transaction History
@@ -38,16 +40,10 @@ const LeftSidebar = () => {
             <Link
               href="#"
               className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+              onClick={() => setSelectedPage("PaymentTran")}
             >
               <ArrowRightLeft className="h-4 w-4" />
               Payment Transfer
-            </Link>
-            <Link
-              href="#"
-              className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
-            >
-              <Landmark className="h-4 w-4" />
-              Connect Bank
             </Link>
           </nav>
         </div>

@@ -1,13 +1,23 @@
 import React, { useEffect, useState } from "react";
-import Msg from "../Msg";
-import BankChart from "./BankChart";
-import Transaction from "./Transaction";
-import { useLocalStorage } from "react-use";
-import axios from "axios";
+import DashboardHome from "./DashboardHome";
+import DashboardTranHist from "./DashboardTranHist";
+import DashboardMyBank from "./DashboardMyBank";
+import DashboardPayment from "./DashboardPayment";
 
-const Body = () => {
+const Body = ({ selectedPage }) => {
   const token = localStorage.getItem("access_token");
   const [accounts, setAccounts] = useState(null);
+  const choosePage = () => {
+    if (selectedPage === "Home") {
+      return <DashboardHome accounts={accounts || []} />;
+    } else if (selectedPage === "MyBank") {
+      return <DashboardMyBank />;
+    } else if (selectedPage === "TransectionHist") {
+      return <DashboardTranHist accounts={accounts || []} />;
+    } else {
+      return <DashboardPayment />;
+    }
+  };
   const fetchAccounts = async () => {
     try {
       const response = await fetch(
@@ -38,22 +48,7 @@ const Body = () => {
     console.log(accounts);
   }, [accounts]);
 
-  const [user, setuser] = useLocalStorage("username");
-  return (
-    <div className="w-full md:max-w-[67%] border-r">
-      <div className="px-4 md:px-6 pt-4 flex flex-col gap-3">
-        <Msg
-          Data={{
-            Heading: `Welcome, ${user}`,
-            SubHeading:
-              "Access & Manage Your Account And Transactions Efficiently.",
-          }}
-        />
-        <BankChart accounts={accounts || []} />
-        <Transaction accounts={accounts || []} />
-      </div>
-    </div>
-  );
+  return <>{choosePage()}</>;
 };
 
 export default Body;
