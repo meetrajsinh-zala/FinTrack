@@ -14,10 +14,13 @@ from plaid.model.products import Products
 from plaid.model.country_code import CountryCode
 import plaid
 from plaid.api import plaid_api
+from plaid.model.institutions_get_by_id_request import InstitutionsGetByIdRequest
+from plaid.model.accounts_get_request import AccountsGetRequest
 from django.http import JsonResponse
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import api_view, permission_classes
 
-from .models import Dwolla_customer_details
-from .models import PlaidAccount
+from .models import Dwolla_customer_details,PlaidAccount,PlaidBankAccount,FundingSource
 from api.models import UserDetails
 from django.contrib.auth.models import User
 
@@ -53,14 +56,14 @@ dwolla_client = Client(
 
 
 @csrf_exempt
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def create_link_token(request):
-    body = json.loads(request.body)
-    username = body["username"]
-    user = User.objects.get(username=username)
+    user = request.user
     client_user_id = str(user.id)
     Link_token = LinkTokenCreateRequest(
         products=[Products("auth"), Products("transactions")],
-        client_name="FinTrack",
+        client_name=f"{request.user.first_name} | FinTrack",
         country_codes=[CountryCode("US")],
         language="en",
         user=LinkTokenCreateRequestUser(client_user_id=client_user_id),
@@ -70,11 +73,12 @@ def create_link_token(request):
 
 
 @csrf_exempt
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def exchange_public_token(request):
     body = json.loads(request.body)
     public_token = body["public_token"]
-    username = body["username"]
-    user = User.objects.get(username=username)
+    user = User.objects.get(username=request.user)
 
     req = ItemPublicTokenExchangeRequest(public_token=public_token)
     res = client.item_public_token_exchange(req)
@@ -82,47 +86,71 @@ def exchange_public_token(request):
     access_token = res["access_token"]
     item_id = res["item_id"]
 
-    PlaidAccount.objects.create(
-        user=user,
-        access_token=access_token,
-        item_id=item_id,
+    plaid_account, created = PlaidAccount.objects.get_or_create(
+            user=user,
+            item_id=item_id,
+            defaults={'access_token': access_token}
     )
-
-    processor_token = get_account(username)
-    dwolla_access_token(username, processor_token)
+    
+    if not created:
+        plaid_account.access_token = access_token
+        plaid_account.save()
+        
+    accounts_get_request = AccountsGetRequest(access_token=access_token)
+    accounts_response = client.accounts_get(accounts_get_request)
+    accounts = accounts_response['accounts']
+    
+    institution_id = accounts_response['item']['institution_id']
+    institutions_get_request = InstitutionsGetByIdRequest(institution_id=institution_id,
+            country_codes=[CountryCode("US")])
+    institution_response = client.institutions_get_by_id(institutions_get_request)
+    institution_name = institution_response['institution']['name']
+    institution_id = institution_response['institution']['institution_id']
+    
+    plaid_account.institution_name = institution_name
+    plaid_account.institution_id = institution_id
+    plaid_account.save()
+    
+    for account in accounts:
+        account_id = account['account_id']
+        account_name = account['name']
+        account_subtype = account['subtype']
+        account_balance = account['balances'].get('available', None)
+        
+        bank_account, account_created = PlaidBankAccount.objects.get_or_create(
+                plaid_account=plaid_account,
+                account_id=account_id,
+                defaults={
+                    'account_name': account_name,
+                    'account_subtype': account_subtype,
+                    'balance': account_balance
+                }
+            )
+        
+        if not account_created:
+            bank_account.account_name = account_name
+            bank_account.account_subtype = account_subtype
+            bank_account.balance = account_balance
+            bank_account.save()
+        create_processor_token(access_token, account_id,request.user)
+        
     return JsonResponse({"public_token_exchange": "complete"})
 
 
-def get_account(username):
-    user = User.objects.get(username=username)
-    user = PlaidAccount.objects.get(user=user.id)
-    access_token = user.access_token
-
-    req = AccountsGetRequest(
-        access_token=access_token,
-    )
-    accounts_response = client.accounts_get(req)
-
-    processor_token = create_processor_token(
-        access_token, accounts_response["accounts"][0]["account_id"]
-    )
-    return processor_token
-
-
-def create_processor_token(access_token, account_id):
+def create_processor_token(access_token, account_id,username):
     create_request = ProcessorTokenCreateRequest(
         access_token=access_token, account_id=account_id, processor="dwolla"
     )
     create_response = client.processor_token_create(create_request)
     processor_token = create_response["processor_token"]
-    return processor_token
+    dwolla_access_token(username,processor_token)
+    
 
 
 def dwolla_access_token(username, processor_token):
     credentials = f"{DWOLLA_KEY}:{DWOLLA_SECRET}"
     encoded_credentials = base64.b64encode(credentials.encode()).decode()
 
-    # Prepare the request
     url = "https://api-sandbox.dwolla.com/token"
     headers = {
         "Authorization": f"Basic {encoded_credentials}",
@@ -160,7 +188,6 @@ def create_dwolla_personal_verified_customer(access_token, username):
         "dateOfBirth": user_details.date_of_birth.isoformat(),
         "ssn": "1234",
     }
-    print(data)
     response = requests.post(url, json=data, headers=headers)
     if response.status_code == 201:
         print("Customer created successfully!")
@@ -185,7 +212,38 @@ def create_funding_source(processor_token, access_token, username):
         "name": f"{user.first_name} {user.last_name}",
     }
     response = requests.post(url, json=data, headers=headers)
-
+    if response.status_code == 201:
+        store_funding_source_info(user,access_token,customer_id)
+        print("Funding source created and stored successfully!")
+    else:
+        print(f"Failed to create funding source. Status code: {response.status_code}")
+        print(response.text)
+        
+def store_funding_source_info(user,access_token,customer_id):
+    url = f"https://api-sandbox.dwolla.com/customers/{customer_id}/funding-sources"
+    headers = {
+    "Content-Type": "application/vnd.dwolla.v1.hal+json",
+    "Accept": "application/vnd.dwolla.v1.hal+json",
+    "Authorization": f"Bearer {access_token}",
+    }
+    res = requests.get(url,headers=headers)
+    response_json = res.json()
+    funding_sources = response_json.get('_embedded', {}).get('funding-sources', [])
+        
+    for source in funding_sources:
+        FundingSource.objects.update_or_create(
+            funding_source_id=source['id'],
+            defaults={
+                'user': user,
+                'status': source['status'],
+                'type': source['type'],
+                'name': source['name'],
+                'created': source['created'],
+                'removed': source['removed'],
+                'bank_name': source.get('bankName', ''),
+                'fingerprint': source.get('fingerprint', '')
+            }
+        )
 
 # getAccounts to get multiple accounts
 # getAccount to get one bank account

@@ -127,6 +127,10 @@ REST_FRAMEWORK = {
 
 from datetime import timedelta
 
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+}
+
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 

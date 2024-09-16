@@ -1,42 +1,40 @@
-import React, {useState} from 'react';
-import {Label} from './ui/label';
-import {Input} from './ui/input';
-import {Button} from './ui/button';
-import {Link, useNavigate} from 'react-router-dom';
-import Msg from './Msg';
-import axios from 'axios';
-import {useLocalStorage} from 'react-use';
+import React, { useState } from "react";
+import { Label } from "./ui/label";
+import { Input } from "./ui/input";
+import { Button } from "./ui/button";
+import { Link, useNavigate } from "react-router-dom";
+import Msg from "./Msg";
+import axios from "axios";
+import { useLocalStorage } from "react-use";
 
 const Login = () => {
-  const [formData, setFormData] = useState ({username: '', password: ''});
-  const navigate = useNavigate ();
-  const [accessToken, setaccessToken] = useLocalStorage ('access_token', '');
-  const [refershToken, setrefreshToken] = useLocalStorage ('refresh_token', '');
-  const [user, setuser] = useLocalStorage ('username', '');
-  const [email, setemail] = useLocalStorage ('emali', '');
+  const [formData, setFormData] = useState({ username: "", password: "" });
+  const navigate = useNavigate();
+  const [user, setuser] = useLocalStorage("username", "");
+  const [email, setemail] = useLocalStorage("emali", "");
 
-  const handleChange = e => {
-    setFormData ({...formData, [e.target.name]: e.target.value});
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async e => {
-    e.preventDefault ();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
-      const response = await axios.post (
-        'http://127.0.0.1:8000/api/login/',
+      const response = await axios.post(
+        "http://127.0.0.1:8000/api/login/",
         formData
       );
-      setaccessToken (response.data.access);
-      setrefreshToken (response.data.refresh);
-      setuser (response.data.user.username);
-      setemail (response.data.user.email);
-      navigate ('/LinkYourBank');
+      localStorage.setItem("access_token", response.data.access);
+      localStorage.setItem("refresh_token", response.data.refresh);
+      setuser(response.data.user.username);
+      setemail(response.data.user.email);
+      navigate("/LinkYourBank");
     } catch (error) {
-      console.error (
-        'Login error:',
+      console.error(
+        "Login error:",
         error.response ? error.response.data : error.message
       );
-      alert ('Login failed. Please check your credentials and try again.');
+      alert("Login failed. Please check your credentials and try again.");
     }
   };
 
@@ -45,8 +43,8 @@ const Login = () => {
       <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-lg border flex flex-col gap-5">
         <Msg
           Data={{
-            Heading: 'Log In',
-            SubHeading: 'Welcome back! Please enter your details.',
+            Heading: "Log In",
+            SubHeading: "Welcome back! Please enter your details.",
           }}
         />
         <div>
@@ -69,7 +67,7 @@ const Login = () => {
             onChange={handleChange}
           />
         </div>
-        <Button onClick={e => handleSubmit (e)}>Login</Button>
+        <Button onClick={(e) => handleSubmit(e)}>Login</Button>
         <p className="text-center">
           Don't have an account?&nbsp;
           <Link to="/Signup" className="text-[#1c284f] font-bold">
