@@ -20,7 +20,7 @@ from django.http import JsonResponse
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 
-from .models import Dwolla_customer_details,PlaidAccount,PlaidBankAccount,FundingSource
+from .models import Dwolla_customer_details,PlaidAccount,FundingSource
 from api.models import UserDetails
 from django.contrib.auth.models import User
 
@@ -111,28 +111,11 @@ def exchange_public_token(request):
     plaid_account.institution_id = institution_id
     plaid_account.save()
     
-    for account in accounts:
-        account_id = account['account_id']
-        account_name = account['name']
-        account_subtype = account['subtype']
-        account_balance = account['balances'].get('available', None)
-        
-        bank_account, account_created = PlaidBankAccount.objects.get_or_create(
-                plaid_account=plaid_account,
-                account_id=account_id,
-                defaults={
-                    'account_name': account_name,
-                    'account_subtype': account_subtype,
-                    'balance': account_balance
-                }
-            )
-        
-        if not account_created:
-            bank_account.account_name = account_name
-            bank_account.account_subtype = account_subtype
-            bank_account.balance = account_balance
-            bank_account.save()
-        create_processor_token(access_token, account_id,request.user)
+    if accounts:
+        account = accounts[0]
+        plaid_account.account_id = account['account_id']
+        plaid_account.save()
+        create_processor_token(access_token, account['account_id'],request.user)
         
     return JsonResponse({"public_token_exchange": "complete"})
 
@@ -244,8 +227,3 @@ def store_funding_source_info(user,access_token,customer_id):
                 'fingerprint': source.get('fingerprint', '')
             }
         )
-
-# getAccounts to get multiple accounts
-# getAccount to get one bank account
-# getInstitution to get bank info
-# getTransaction to get transections

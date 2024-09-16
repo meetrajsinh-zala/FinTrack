@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     "corsheaders",
 ]
 
-EXTERNAL_APPS = ["api", "plaidapi"]
+EXTERNAL_APPS = ["api", "plaidapi",'Account']
 
 INSTALLED_APPS += EXTERNAL_APPS
 

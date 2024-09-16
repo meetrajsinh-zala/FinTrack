@@ -6,15 +6,9 @@ class PlaidAccount(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     access_token = models.CharField(max_length=255)
     item_id = models.CharField(max_length=255, null=True, blank=True)
+    account_id = models.CharField(max_length=255,blank=True,null=True)
     institution_name = models.CharField(max_length=255, null=True, blank=True)
     institution_id = models.CharField(max_length=255, null=True, blank=True)   
-
-class PlaidBankAccount(models.Model):
-    plaid_account = models.ForeignKey(PlaidAccount, on_delete=models.CASCADE, related_name='bank_accounts')
-    account_id = models.CharField(max_length=255)
-    account_name = models.CharField(max_length=255)
-    account_subtype = models.CharField(max_length=50)
-    balance = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
 
 class Dwolla_customer_details(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)

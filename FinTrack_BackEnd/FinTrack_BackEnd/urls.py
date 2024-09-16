@@ -22,4 +22,5 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include("api.urls")),
     path("plaidapi/", include("plaidapi.urls")),
+    path('Account/',include('Account.urls'))
 ]
