@@ -6,6 +6,8 @@ import { Link, useNavigate } from "react-router-dom";
 import Msg from "./Msg";
 import axios from "axios";
 import { useLocalStorage } from "react-use";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Login = () => {
   const [formData, setFormData] = useState({ username: "", password: "" });
@@ -28,7 +30,15 @@ const Login = () => {
       localStorage.setItem("refresh_token", response.data.refresh);
       setuser(response.data.user.username);
       setemail(response.data.user.email);
-      navigate("/LinkYourBank");
+      toast.success("Successfully Logged In...", {
+        position: "top-center",
+      });
+      toast("Rediracting To The Bank Linking...", {
+        position: "top-center",
+      });
+      setTimeout(() => {
+        navigate("/LinkYourBank");
+      }, 2000);
     } catch (error) {
       console.error(
         "Login error:",
@@ -40,6 +50,7 @@ const Login = () => {
 
   return (
     <div className="flex h-screen justify-center items-center">
+      <ToastContainer />
       <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-lg border flex flex-col gap-5">
         <Msg
           Data={{

@@ -131,6 +131,8 @@ def create_processor_token(access_token, account_id,username):
 
 
 def dwolla_access_token(username, processor_token):
+    user = User.objects.get(username=username)
+    dwolla_customer = Dwolla_customer_details.objects.get(user=user)
     credentials = f"{DWOLLA_KEY}:{DWOLLA_SECRET}"
     encoded_credentials = base64.b64encode(credentials.encode()).decode()
 
@@ -146,7 +148,8 @@ def dwolla_access_token(username, processor_token):
     if response.status_code == 200:
         response_json = response.json()
         access_token = response_json.get("access_token", None)
-        create_dwolla_personal_verified_customer(access_token, username)
+        if not Dwolla_customer_details:
+            create_dwolla_personal_verified_customer(access_token, username)
         create_funding_source(processor_token, access_token, username)
 
 

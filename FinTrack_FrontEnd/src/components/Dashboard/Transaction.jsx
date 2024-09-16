@@ -1,12 +1,26 @@
-import React from 'react';
-import {Card, CardHeader, CardTitle} from '../ui/card';
-import {Button} from '../ui/button';
-import CountUp from 'react-countup';
-import {Badge} from '../ui/badge';
-import {Avatar, AvatarFallback, AvatarImage} from '@/components/ui/avatar';
-import TransactionTable from './TransactionTable';
+import React, { useState, useEffect } from "react";
+import { Card, CardHeader, CardTitle } from "../ui/card";
+import { Button } from "../ui/button";
+import TransactionTable from "./TransactionTable";
+import BankAccountCard from "./BankAccountCard";
 
-const Transaction = () => {
+const Transaction = ({ accounts }) => {
+  const [selectedBank, setSelectedBank] = useState(null);
+  const [selectedAccount, setSelectedAccount] = useState(null);
+
+  const handleBankClick = (bankName) => {
+    setSelectedBank(bankName);
+    const account = accounts.find((acc) => acc.institution_name === bankName);
+    setSelectedAccount(account);
+  };
+
+  useEffect(() => {
+    if (accounts.length > 0) {
+      setSelectedBank(accounts[0].institution_name);
+      setSelectedAccount(accounts[0]);
+    }
+  }, [accounts]);
+
   return (
     <React.Fragment>
       <Card className="border-none shadow-none flex flex-col gap-4">
@@ -17,45 +31,23 @@ const Transaction = () => {
           </Button>
         </CardHeader>
         <div className="flex gap-4">
-          <button className="font-medium text-muted-foreground pb-2 activeBank">
-            KOTAK MAHINDRA BANK
-          </button>
-          <button className="font-medium text-muted-foreground pb-2">
-            STATE BANK OF INDIA
-          </button>
+          {accounts.map((account, index) => {
+            const isSelected = selectedBank === account.institution_name;
+            return (
+              <button
+                className={`font-medium text-muted-foreground pb-2 ${
+                  isSelected && "activeBank"
+                }`}
+                key={index}
+                onClick={() => handleBankClick(account.institution_name)}
+              >
+                {account.institution_name} Bank
+              </button>
+            );
+          })}
         </div>
       </Card>
-      <Card className="bg-[#f5faff] shadow-none border-none">
-        <div className="flex justify-between items-stretch px-5 py-4">
-          <div className="flex items-stretch gap-5">
-            <Avatar>
-              <AvatarImage src="" />
-              <AvatarFallback className="bg-[#1570ef] text-white ">
-                KB
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex flex-col gap-3">
-              <h2 className="text-lg font-semibold text-[#194185]">
-                KOTAK MAHINDRA BANK
-              </h2>
-              <h2 className="text-lg md:text-xl font-semibold text-[#1570ef]">
-                <CountUp
-                  end={1500}
-                  prefix="₹ "
-                  decimals={2}
-                  decimal="."
-                  duration={3}
-                />
-              </h2>
-            </div>
-          </div>
-          <div>
-            <Badge className="bg-[#e4fced] hover:bg-[#e4fced] text-[#198557] text-sm">
-              saving
-            </Badge>
-          </div>
-        </div>
-      </Card>
+      <BankAccountCard selectedAccount={selectedAccount} />
       <TransactionTable />
     </React.Fragment>
   );

@@ -2,6 +2,8 @@ import { PlaidLink } from "react-plaid-link";
 import { useState, useEffect } from "react";
 import { useLocalStorage } from "react-use";
 import { useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function PlaidConnect() {
   const [linkToken, setLinkToken] = useState(null);
@@ -57,7 +59,12 @@ function PlaidConnect() {
       if (response.ok) {
         const data = await response.json();
         console.log("Access Token:", data.access_token);
-        navigate("/Dashboard");
+        toast.success("Successfully Added Your Bank Account...", {
+          position: "bottom-right",
+        });
+        setTimeout(() => {
+          navigate("/Dashboard");
+        }, 2000);
       } else {
         console.error("Error exchanging public token:", response.statusText);
       }
