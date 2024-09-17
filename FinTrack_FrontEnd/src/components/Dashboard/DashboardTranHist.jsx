@@ -1,23 +1,23 @@
-import React, { useState } from "react";
-import Msg from "../Msg";
+import React, {useState} from 'react';
+import Msg from '../Msg';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "../ui/card";
-import TransactionTable from "./TransactionTable";
+} from '../ui/card';
+import TransactionTable from './TransactionTable';
 
-const DashboardTranHist = ({ accounts }) => {
-  const [selectedAccount, setSelectedAccount] = useState(accounts[0] || null); // Default to the first account
+const DashboardTranHist = ({accounts}) => {
+  const [selectedAccount, setSelectedAccount] = useState (accounts[0] || null); // Default to the first account
 
   return (
     <div className="w-full border-r">
@@ -26,22 +26,21 @@ const DashboardTranHist = ({ accounts }) => {
           <Msg
             Data={{
               Heading: `Transactions`,
-              SubHeading: "View All Your Previous Transactions...",
+              SubHeading: 'View All Your Previous Transactions...',
             }}
           />
           <Select
-            onValueChange={(value) =>
-              setSelectedAccount(
-                accounts.find((account) => account.institution_name === value)
-              )
-            }
+            onValueChange={value =>
+              setSelectedAccount (
+                accounts.find (account => account.account_id === value)
+              )}
           >
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Select Account" />
             </SelectTrigger>
             <SelectContent>
-              {accounts.map((account, idx) => (
-                <SelectItem value={account.institution_name} key={idx}>
+              {accounts.map ((account, idx) => (
+                <SelectItem value={account.account_id} key={idx}>
                   {account.institution_name} Bank
                 </SelectItem>
               ))}
@@ -49,7 +48,7 @@ const DashboardTranHist = ({ accounts }) => {
           </Select>
         </div>
 
-        {selectedAccount && (
+        {selectedAccount &&
           <Card className="flex flex-row justify-between items-center p-6 gap-2 text-white bg-[#1570ef] mt-4">
             <div>
               <CardHeader className="flex flex-col items-start mb-2">
@@ -72,9 +71,8 @@ const DashboardTranHist = ({ accounts }) => {
                 </CardHeader>
               </Card>
             </div>
-          </Card>
-        )}
-        <TransactionTable selectedBank={selectedAccount.institution_name} />
+          </Card>}
+        <TransactionTable selectedBankId={selectedAccount.account_id} />
       </div>
     </div>
   );

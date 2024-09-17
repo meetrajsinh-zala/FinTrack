@@ -13,6 +13,7 @@ const App = () => {
     <div className="w-full h-full">
       <Navbar />
       <Outlet />
+      {!localStorage.getItem ('access_token') && <Navigate to={'Login'} />}
     </div>
   );
 };

@@ -11,9 +11,11 @@ import {
 import { Badge } from "../ui/badge";
 import { useEffect } from "react";
 
-const TransactionTable = ({ selectedBank }) => {
+const TransactionTable = ({ selectedBankId }) => {
   const token = localStorage.getItem("access_token");
-  const [transections, setTransections] = useState(null);
+  const [transactions, setTransactions] = useState(null);
+  console.log(selectedBankId)
+  
   const fetchTransections = async () => {
     try {
       const response = await fetch(
@@ -27,15 +29,34 @@ const TransactionTable = ({ selectedBank }) => {
       );
       if (response.ok) {
         const data = await response.json();
-        setTransections(data);
-        console.log(transections);
+        setTransactions(data["transactions"]);
+        console.log(transactions);
       }
     } catch (err) {
       console.log(err.message);
     }
   };
+
+  const transfer = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/Account/transfer/",{
+        method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+      })
+      if (response.ok) {
+        const data = await response.json();
+        setTransactions(data)
+        console.log(data);
+      }
+    } catch (error) {
+      console.log(err.message)
+    }
+  }
   useEffect(() => {
-    fetchTransections();
+    // fetchTransections();
+    transfer()
   }, []);
   return (
     <Table className="mt-3">
@@ -45,26 +66,30 @@ const TransactionTable = ({ selectedBank }) => {
           <TableHead>Amount</TableHead>
           <TableHead>Status</TableHead>
           <TableHead>Date</TableHead>
-          <TableHead>Category</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        {transections?.length > 0 ? (
-          <TableRow className="hover:bg-transparent">
-            <TableCell className="text-zinc-700 font-medium">
-              Alexa Doe
-            </TableCell>
-            <TableCell className="deposite font-semibold">- ₹500.00</TableCell>
-            <TableCell>
-              <Badge variant="process">• Processing</Badge>
-            </TableCell>
-            <TableCell className="font-medium text-slate-500">
-              Wed 1:00 PM
-            </TableCell>
-            <TableCell>
-              <Badge variant="outline_success">Deposite</Badge>
-            </TableCell>
-          </TableRow>
+        {transactions?.transactions?.length > 0 ? (
+          transactions.transactions.map(trans => {
+            return (
+              trans.source_account === selectedBankId && (
+                <TableRow key={trans.id} className="hover:bg-transparent">
+                  <TableCell className="text-zinc-700 font-medium">
+                    {transactions.fname}
+                  </TableCell>
+                  <TableCell className="withdraw font-semibold">
+                    - {trans.amount}.00
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="process">• {trans.status}</Badge>
+                  </TableCell>
+                  <TableCell className="font-medium text-slate-500">
+                    {new Date(trans.created_at).toLocaleDateString()}
+                  </TableCell>
+                </TableRow>
+              )
+            )
+          })
         ) : (
           <TableRow>
             <TableCell>No Transections</TableCell>
