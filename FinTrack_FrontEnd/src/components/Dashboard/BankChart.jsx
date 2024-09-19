@@ -1,61 +1,63 @@
-import React, { useState, useEffect } from "react";
-import CountUp from "react-countup";
-import { Button } from "../ui/button";
-import { Card } from "../ui/card";
-import { Doughnut } from "react-chartjs-2";
-import { ArcElement, Chart, Legend, Tooltip } from "chart.js";
-import PlaidConnect from "../PlaidConnect";
+import React, {useState, useEffect} from 'react';
+import CountUp from 'react-countup';
+// import {Button} from '../ui/button';
+import {Card} from '../ui/card';
+import {Doughnut} from 'react-chartjs-2';
+import {ArcElement, Chart, Legend, Tooltip} from 'chart.js';
+import PlaidConnect from '../PlaidConnect';
 
-Chart.register(ArcElement, Tooltip, Legend);
+Chart.register (ArcElement, Tooltip, Legend);
 
-const BankChart = ({ accounts }) => {
-  const [totalBalance, setTotalBalance] = useState(0);
-  const [chartData, setChartData] = useState({
+const BankChart = ({accounts}) => {
+  const [totalBalance, setTotalBalance] = useState (0);
+  const [chartData, setChartData] = useState ({
     labels: [],
     datasets: [
       {
-        label: "Banks",
+        label: 'Banks',
         data: [],
         backgroundColor: [],
       },
     ],
   });
 
-  const generateColors = (numColors) => {
+  const generateColors = numColors => {
     const colors = [];
     for (let i = 0; i < numColors; i++) {
-      const blueShade = `rgb(${Math.floor(Math.random() * 50)}, ${Math.floor(
-        Math.random() * 50
-      )}, ${150 + Math.floor(Math.random() * 105)})`; // Blue value between 150-255
-      colors.push(blueShade);
+      const blueShade = `rgb(${Math.floor (Math.random () * 50)}, ${Math.floor (Math.random () * 50)}, ${150 + Math.floor (Math.random () * 105)})`; // Blue value between 150-255
+      colors.push (blueShade);
     }
     return colors;
   };
 
-  useEffect(() => {
-    if (accounts && accounts.length > 0) {
-      const balance = accounts.reduce(
-        (acc, account) => acc + account.balances.available,
-        0
-      );
-      setTotalBalance(balance);
+  useEffect (
+    () => {
+      if (accounts && accounts.length > 0) {
+        const balance = accounts.reduce (
+          (acc, account) => acc + account.balances.available,
+          0
+        );
+        setTotalBalance (balance);
 
-      const labels = accounts.map((account) => account.institution_name);
-      const data = accounts.map((account) => account.balances.available);
-      const backgroundColor = generateColors(accounts.length);
+        const labels = accounts.map (account => account.institution_name);
+        const data = accounts.map (account => account.balances.available);
+        const backgroundColor = generateColors (accounts.length);
 
-      setChartData({
-        labels,
-        datasets: [
-          {
-            label: "Banks",
-            data,
-            backgroundColor,
-          },
-        ],
-      });
-    }
-  }, [accounts]);
+        setChartData ({
+          labels,
+          datasets: [
+            {
+              label: 'Banks',
+              data,
+              backgroundColor,
+            },
+          ],
+        });
+      }
+    },
+    [accounts]
+  );
+
   return (
     <Card>
       <div className="flex flex-col md:flex-row px-5 pb-3 pt-3 gap-10 items-start justify-between">
@@ -64,7 +66,7 @@ const BankChart = ({ accounts }) => {
             <Doughnut
               data={chartData}
               options={{
-                cutout: "60%",
+                cutout: '60%',
                 plugins: {
                   legend: {
                     display: false,

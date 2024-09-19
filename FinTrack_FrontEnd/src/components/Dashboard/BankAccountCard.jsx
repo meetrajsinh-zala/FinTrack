@@ -25,7 +25,7 @@ const BankAccountCard = ({ selectedAccount }) => {
           </Avatar>
           <div className="flex flex-col gap-3">
             <h2 className="text-lg font-semibold text-[#194185]">
-              {institution_name} Bank
+              {institution_name}
             </h2>
             <h2 className="text-lg md:text-xl font-semibold text-[#1570ef]">
               <CountUp

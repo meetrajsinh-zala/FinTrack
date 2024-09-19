@@ -24,7 +24,7 @@ const CreditCard = ({account}) => {
       <div className="card relative h-[220px] w-[400px] flex flex-col justify-end px-6 py-10 text-white rounded-3xl gap-8 bg-gradient-to-r from-purple-500 to-pink-500">
         <div>
           <p className="text-2xl  font-medium">
-            {account.institution_name} Bank
+            {account.institution_name}
           </p>
           <p className="text-2xl  font-medium">XXXX XXXX XXXX {account.mask}</p>
         </div>

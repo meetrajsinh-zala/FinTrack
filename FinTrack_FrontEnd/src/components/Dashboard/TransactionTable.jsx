@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -11,31 +10,52 @@ import {
 import { Badge } from "../ui/badge";
 import { useEffect } from "react";
 
-const TransactionTable = ({ selectedBankId }) => {
+const TransactionTable = ({ selectedBankId, Limit }) => {
   const token = localStorage.getItem("access_token");
   const [transactions, setTransactions] = useState(null);
-  console.log(selectedBankId)
-  
   const fetchTransections = async () => {
     try {
       const response = await fetch(
         "http://localhost:8000/Account/getTransections/",
         {
-          method: "GET",
+          method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
           },
+            body: JSON.stringify ({
+              selectedBankId,
+            }),
         }
       );
       if (response.ok) {
         const data = await response.json();
-        setTransactions(data["transactions"]);
-        console.log(transactions);
+        console.log(data);
       }
     } catch (err) {
       console.log(err.message);
     }
   };
+
+  const getTransaction = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/Account/fetchTransaction/", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify ({
+          selectedBankId,
+        }),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setTransactions(data);
+      }
+    } catch (err) {
+      console.error("Error fetching transactions:", err.message);
+    }
+
+  }
 
   const transfer = async () => {
     try {
@@ -54,10 +74,17 @@ const TransactionTable = ({ selectedBankId }) => {
       console.log(err.message)
     }
   }
+
+    const displayedTransactions = Limit
+      ? transactions?.slice(0, 5) || []
+      : transactions || [];
+
+
   useEffect(() => {
-    // fetchTransections();
-    transfer()
-  }, []);
+    fetchTransections()
+    getTransaction()
+    // transfer()
+  }, [selectedBankId]);
   return (
     <Table className="mt-3">
       <TableHeader>
@@ -66,25 +93,29 @@ const TransactionTable = ({ selectedBankId }) => {
           <TableHead>Amount</TableHead>
           <TableHead>Status</TableHead>
           <TableHead>Date</TableHead>
+          <TableHead>Category</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        {transactions?.transactions?.length > 0 ? (
-          transactions.transactions.map(trans => {
+        {displayedTransactions?.length > 0 ? (
+          displayedTransactions.map((trans,idx) => {
             return (
-              trans.source_account === selectedBankId && (
-                <TableRow key={trans.id} className="hover:bg-transparent">
+              (
+                <TableRow key={idx} className="hover:bg-transparent">
                   <TableCell className="text-zinc-700 font-medium">
-                    {transactions.fname}
+                    {trans.name}
                   </TableCell>
-                  <TableCell className="withdraw font-semibold">
-                    - {trans.amount}.00
+                  <TableCell className={`${trans.amount[0]==="-" ? "withdraw" : 'deposite'} font-semibold`}>
+                   $ {trans.amount}
                   </TableCell>
                   <TableCell>
-                    <Badge variant="process">• {trans.status}</Badge>
+                    <Badge variant={`${trans.status === "Completed" ? 'success' : 'process'}`}>{trans.status}</Badge>
                   </TableCell>
                   <TableCell className="font-medium text-slate-500">
-                    {new Date(trans.created_at).toLocaleDateString()}
+                    {trans.date}
+                  </TableCell>
+                  <TableCell>
+                  <Badge variant={`${JSON.parse(trans.category.replace(/'/g, '"'))[0]}`}>{JSON.parse(trans.category.replace(/'/g, '"'))[0]}</Badge>
                   </TableCell>
                 </TableRow>
               )

@@ -41,7 +41,7 @@ const DashboardTranHist = ({accounts}) => {
             <SelectContent>
               {accounts.map ((account, idx) => (
                 <SelectItem value={account.account_id} key={idx}>
-                  {account.institution_name} Bank
+                  {account.institution_name}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -72,7 +72,10 @@ const DashboardTranHist = ({accounts}) => {
               </Card>
             </div>
           </Card>}
-        <TransactionTable selectedBankId={selectedAccount.account_id} />
+        <TransactionTable
+          selectedBankId={selectedAccount.account_id}
+          Limit={false}
+        />
       </div>
     </div>
   );

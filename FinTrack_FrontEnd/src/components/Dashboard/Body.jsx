@@ -3,10 +3,13 @@ import DashboardHome from './DashboardHome';
 import DashboardTranHist from './DashboardTranHist';
 import DashboardMyBank from './DashboardMyBank';
 import DashboardPayment from './DashboardPayment';
+import {Navigate} from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
 
 const Body = ({selectedPage}) => {
   const token = localStorage.getItem ('access_token');
   const [accounts, setAccounts] = useState (null);
+
   const choosePage = () => {
     if (selectedPage === 'Home') {
       return <DashboardHome accounts={accounts || []} />;
@@ -18,6 +21,7 @@ const Body = ({selectedPage}) => {
       return <DashboardPayment accounts={accounts || []} />;
     }
   };
+
   const fetchAccounts = async () => {
     try {
       const response = await fetch (
@@ -44,14 +48,11 @@ const Body = ({selectedPage}) => {
     fetchAccounts ();
   }, []);
 
-  useEffect (
-    () => {
-      console.log (accounts);
-    },
-    [accounts]
+  return (
+    <React.Fragment>
+      {accounts?.length > 0 && choosePage ()}
+    </React.Fragment>
   );
-
-  return <React.Fragment>{choosePage ()}</React.Fragment>;
 };
 
 export default Body;

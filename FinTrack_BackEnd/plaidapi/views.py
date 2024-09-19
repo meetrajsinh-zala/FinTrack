@@ -19,6 +19,8 @@ from plaid.model.accounts_get_request import AccountsGetRequest
 from django.http import JsonResponse
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
+from decimal import Decimal
 
 from .models import Dwolla_customer_details, PlaidAccount, FundingSource
 from api.models import UserDetails
@@ -39,7 +41,6 @@ load_dotenv()
 PLAID_CLIENT_ID = os.getenv("PLAID_CLIENT_ID")
 PLAID_SECRET = os.getenv("PLAID_SECRET")
 PLAID_ENV = os.getenv("PLAID_ENV", "sandbox")
-
 DWOLLA_KEY = os.getenv("DWOLLA_KEY")
 DWOLLA_SECRET = os.getenv("DWOLLA_SECRET")
 
@@ -72,6 +73,7 @@ def create_link_token(request):
         client_name=f"{request.user.first_name} | FinTrack",
         country_codes=[CountryCode("US")],
         language="en",
+        webhook="https://webhook.site/ec7c8626-8f22-47de-ad79-fbc6d0680240",
         user=LinkTokenCreateRequestUser(client_user_id=client_user_id),
     )
     response = client.link_token_create(Link_token)
@@ -241,28 +243,6 @@ def store_funding_source_info(user, access_token, customer_id, plaid_account):
         )
 
 
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-import requests
-from decimal import Decimal
-import logging
-
-# Configure logger
-logger = logging.getLogger(__name__)
-
-
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-import requests
-from decimal import Decimal
-import logging
-
-# Configure logger
-logger = logging.getLogger(__name__)
-
-
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def make_transaction(request):
@@ -337,15 +317,12 @@ def make_transaction(request):
                 }
             )
         else:
-            # Log error and return response
             logger.error(f"Dwolla API error: {response.status_code} - {response.text}")
             return Response({"error": response.json()}, status=response.status_code)
 
     except requests.exceptions.RequestException as e:
-        # Handle network errors
         logger.error(f"Request error: {e}")
         return Response({"error": "Network error occurred"}, status=500)
     except Exception as e:
-        # Handle other errors
         logger.error(f"Error initiating transaction: {e}")
         return Response({"error": str(e)}, status=500)

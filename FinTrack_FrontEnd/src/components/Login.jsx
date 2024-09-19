@@ -26,10 +26,12 @@ const Login = () => {
         "http://127.0.0.1:8000/api/login/",
         formData
       );
+      
       localStorage.setItem("access_token", response.data.access);
       localStorage.setItem("refresh_token", response.data.refresh);
       setuser(response.data.user.username);
       setemail(response.data.user.email);
+
       toast.success("Successfully Logged In...", {
         position: "top-center",
       });

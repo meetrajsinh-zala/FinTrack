@@ -10,7 +10,6 @@ const Transaction = ({accounts}) => {
   const [selectedBankId, setSelectedBankId] = useState (null);
 
   const handleBankClick = (bankName, account_id) => {
-    console.log (account_id);
     setSelectedBank (bankName);
     setSelectedBankId (account_id);
     const account = accounts.find (acc => acc.institution_name === bankName);
@@ -33,9 +32,9 @@ const Transaction = ({accounts}) => {
       <Card className="border-none shadow-none flex flex-col gap-4">
         <CardHeader>
           <CardTitle>Recent Transactions</CardTitle>
-          <Button className="bg-transparent text-zinc-800 border-2 hover:bg-[#4893ff] hover:text-white hover:border-[#4893ff] transition-all duration-300">
+          {/* <Button className="bg-transparent text-zinc-800 border-2 hover:bg-[#4893ff] hover:text-white hover:border-[#4893ff] transition-all duration-300">
             View All
-          </Button>
+          </Button> */}
         </CardHeader>
         <div className="flex gap-4">
           {accounts.map ((account, index) => {
@@ -50,14 +49,14 @@ const Transaction = ({accounts}) => {
                     account.account_id
                   )}
               >
-                {account.institution_name} Bank
+                {account.institution_name}
               </button>
             );
           })}
         </div>
       </Card>
       <BankAccountCard selectedAccount={selectedAccount} />
-      <TransactionTable selectedBankId={selectedBankId} />
+      <TransactionTable selectedBankId={selectedBankId} Limit={true} />
     </React.Fragment>
   );
 };
